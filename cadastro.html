@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Conta - Academic Planner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .bg-univille-gradient { background: linear-gradient(135deg, #083f0c 0%, #002d5c 100%); }
+        .glass-panel { background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.2); }
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        /* Estilo do Input de Arquivo */
+        .file-upload {
+            border: 2px dashed #cbd5e1;
+            transition: all 0.3s;
+        }
+        .file-upload:hover { border-color: #008542; background-color: #f0fdf4; }
+    </style>
+</head>
+<body class="bg-univille-gradient min-h-screen flex items-center justify-center p-4">
+
+    <main class="w-full max-w-2xl fade-in relative">
+        
+        <!-- Efeito de fundo -->
+        <div class="absolute -top-10 -right-10 w-64 h-64 bg-[#008542] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse"></div>
+        <div class="absolute -bottom-10 -left-10 w-64 h-64 bg-[#002d5c] rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" style="animation-delay: 1s;"></div>
+
+        <div class="glass-panel shadow-2xl rounded-2xl overflow-hidden relative z-10 flex flex-col md:flex-row">
+            
+            <!-- Lado Esquerdo: Upload de Foto -->
+            <div class="md:w-1/3 bg-slate-50 p-8 flex flex-col items-center justify-center border-r border-slate-100">
+                <div class="relative group cursor-pointer w-32 h-32 mb-4">
+                    <div id="preview-container" class="w-full h-full rounded-full bg-slate-200 overflow-hidden border-4 border-white shadow-md flex items-center justify-center">
+                        <i id="icon-placeholder" class="fa-solid fa-camera text-4xl text-slate-400"></i>
+                        <img id="img-preview" class="w-full h-full object-cover hidden" src="" alt="Preview">
+                    </div>
+                    <div class="absolute inset-0 bg-black bg-opacity-40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span class="text-white text-xs font-bold">Alterar Foto</span>
+                    </div>
+                    <input type="file" id="file-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewImage(event)">
+                </div>
+                <p class="text-xs text-center text-slate-500 mb-2">Clique para enviar uma foto</p>
+            </div>
+
+            <!-- Lado Direito: Formulário -->
+            <div class="md:w-2/3 p-8">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-[#002d5c]">Crie seu Perfil</h2>
+                    <p class="text-slate-500 text-sm">Junte-se ao Academic Planner</p>
+                </div>
+
+                <form id="signup-form" onsubmit="handleSignup(event)">
+                    
+                    <!-- Nome de Usuário -->
+                    <div class="mb-4">
+                        <label class="block text-slate-700 text-sm font-bold mb-2">Nome de Usuário</label>
+                        <div class="relative">
+                            <input type="text" id="username" maxlength="15"
+                                class="w-full pl-4 pr-20 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008542] bg-slate-50" 
+                                placeholder="Ex: Zezinho da Silva" required oninput="updateTagPreview()">
+                            <div class="absolute inset-y-0 right-0 pr-4 flex items-center text-slate-400 font-mono select-none">
+                                #<span id="tag-preview">????</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 mt-1">Sua tag única será gerada automaticamente.</p>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="mb-4">
+                        <label class="block text-slate-700 text-sm font-bold mb-2">E-mail Acadêmico</label>
+                        <input type="email" id="email" 
+                            class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008542] bg-slate-50" 
+                            placeholder="seu.email@univille.br" required>
+                    </div>
+
+                    <!-- Senha -->
+                    <div class="mb-6">
+                        <label class="block text-slate-700 text-sm font-bold mb-2">Senha</label>
+                        <input type="password" id="password" 
+                            class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008542] bg-slate-50" 
+                            placeholder="••••••••" required minlength="6">
+                    </div>
+
+                    <button type="submit" id="btn-signup"
+                        class="w-full bg-[#008542] hover:bg-[#006b35] text-white font-bold py-3 px-4 rounded-lg shadow-md transition-all duration-200 flex items-center justify-center gap-2">
+                        <span>Criar Conta</span>
+                        <i class="fa-solid fa-rocket"></i>
+                    </button>
+                </form>
+
+                <div class="mt-6 text-center border-t border-slate-100 pt-4">
+                    <p class="text-sm text-slate-600">
+                        Já tem uma conta? 
+                        <a href="login.html" class="text-[#002d5c] font-bold hover:text-[#008542] transition">Fazer Login</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
+
+        // --- CONFIGURAÇÃO DO FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBkod_3W8rWTxEHe7C6fEjzs46LokAhVU",
+            authDomain: "trabalho-dew-bd026.firebaseapp.com",
+            projectId: "trabalho-dew-bd026",
+            storageBucket: "trabalho-dew-bd026.firebasestorage.app",
+            messagingSenderId: "532853365174",
+            appId: "1:532853365174:web:06b7539419538380c6c917",
+            measurementId: "G-GX5KXSP4SL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // Gerar Tag Aleatória
+        const userTag = Math.floor(1000 + Math.random() * 9000);
+        document.getElementById('tag-preview').textContent = userTag;
+
+        let selectedFile = null;
+
+        window.previewImage = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                // Validação simples de tamanho (ex: Max 2MB)
+                if (file.size > 2 * 1024 * 1024) {
+                    showToast("A imagem deve ter no máximo 2MB.", "error");
+                    return;
+                }
+                selectedFile = file;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    document.getElementById('img-preview').src = e.target.result;
+                    document.getElementById('img-preview').classList.remove('hidden');
+                    document.getElementById('icon-placeholder').classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            }
+        };
+
+        window.updateTagPreview = () => {
+            // Apenas visual
+        };
+
+        window.handleSignup = async (e) => {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value.trim();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const fullDiscordTag = `${username}#${userTag}`;
+
+            if(!username) return showToast("Escolha um nome de usuário", "error");
+
+            const btn = document.getElementById('btn-signup');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Processando...';
+            btn.disabled = true;
+
+            try {
+                // 1. Criar Usuário no Firebase Auth primeiro (para ter o UID)
+                btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Criando Conta...';
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                let photoURL = "https://ui-avatars.com/api/?name=" + username + "&background=random"; // Padrão
+
+                // 2. Upload para o Firebase Storage (se tiver arquivo)
+                if (selectedFile) {
+                    btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Enviando Foto...';
+                    
+                    // Cria uma referência: profile_photos/UID_DO_USUARIO.jpg
+                    const storageRef = ref(storage, `profile_photos/${user.uid}`);
+                    
+                    // Upload do arquivo
+                    await uploadBytes(storageRef, selectedFile);
+                    
+                    // Pega a URL pública
+                    photoURL = await getDownloadURL(storageRef);
+                }
+
+                // 3. Atualizar Perfil Básico do Auth
+                await updateProfile(user, {
+                    displayName: fullDiscordTag,
+                    photoURL: photoURL
+                });
+
+                // 4. Salvar Dados Completos no Firestore
+                btn.innerHTML = '<i class="fa-solid fa-database"></i> Salvando Perfil...';
+                await setDoc(doc(db, "users", user.uid), {
+                    uid: user.uid,
+                    email: email,
+                    username: username,
+                    discriminator: userTag.toString(),
+                    fullTag: fullDiscordTag,
+                    photoURL: photoURL,
+                    createdAt: new Date(),
+                    storagePath: selectedFile ? `profile_photos/${user.uid}` : null // Útil se quiser apagar depois
+                });
+
+                showToast("Conta criada com sucesso!");
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1500);
+
+            } catch (error) {
+                console.error(error);
+                let msg = "Erro ao criar conta: " + error.message;
+                if (error.code === 'storage/unauthorized') msg = "Erro de permissão ao salvar imagem.";
+                showToast(msg, "error");
+                
+                // Opcional: Se falhar no meio, poderíamos deletar o usuário criado, 
+                // mas por simplicidade vamos deixar o usuário tentar de novo ou tratar depois.
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        };
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-[#002d5c]' : 'bg-red-600';
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white shadow-lg fade-in z-50 ${bgColor} flex items-center gap-3`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-triangle-exclamation'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>

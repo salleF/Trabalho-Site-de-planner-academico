@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Academic Planner Univille</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Fundo com gradiente institucional */
+        .bg-univille-gradient {
+            background: linear-gradient(135deg, #083f0c 0%, #002d5c 100%);
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .fade-in { animation: fadeIn 0.5s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* Input customizado */
+        .input-group:focus-within i { color: #008542; }
+        .input-group:focus-within input { 
+            border-color: #008542; 
+            box-shadow: 0 0 0 2px #008542; 
+            outline: none;
+        }
+    </style>
+</head>
+<body class="bg-univille-gradient min-h-screen flex items-center justify-center p-4">
+
+    <main class="w-full max-w-md fade-in relative">
+        
+        <div class="absolute -top-10 -left-10 w-32 h-32 bg-[#008542] rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
+        <div class="absolute -bottom-10 -right-10 w-32 h-32 bg-[#002d5c] rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse" style="animation-delay: 1s;"></div>
+
+        <div class="glass-panel shadow-2xl rounded-2xl overflow-hidden relative z-10">
+            
+            <div class="bg-gray-50 px-8 py-6 border-b border-gray-100 text-center">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-[#e6f3eb] text-[#008542] mb-4 shadow-sm">
+                    <i class="fa-solid fa-graduation-cap text-3xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-[#002d5c]">Bem-vindo de volta</h2>
+                <p class="text-slate-500 text-sm mt-1">Acesse seu Academic Planner</p>
+            </div>
+
+            <div class="p-8">
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    
+                    <div class="mb-5">
+                        <label class="block text-slate-700 text-sm font-bold mb-2" for="email">E-mail ou Matrícula</label>
+                        <div class="input-group relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-user text-slate-400 transition-colors duration-200"></i>
+                            </div>
+                            <input type="email" id="email" 
+                                class="w-full pl-10 pr-3 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008542] focus:border-transparent transition-all shadow-sm bg-slate-50 focus:bg-white" 
+                                placeholder="seu.email@univille.br" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="block text-slate-700 text-sm font-bold" for="password">Senha</label>
+                            <a href="#" class="text-xs text-[#008542] hover:underline font-medium">Esqueceu a senha?</a>
+                        </div>
+                        <div class="input-group relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="fa-solid fa-lock text-slate-400 transition-colors duration-200"></i>
+                            </div>
+                            <input type="password" id="password" 
+                                class="w-full pl-10 pr-10 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008542] focus:border-transparent transition-all shadow-sm bg-slate-50 focus:bg-white" 
+                                placeholder="••••••••" required>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center cursor-pointer text-slate-400 hover:text-slate-600" onclick="togglePassword()">
+                                <i class="fa-solid fa-eye" id="eye-icon"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="submit" id="btn-login"
+                        class="w-full bg-[#008542] hover:bg-[#006b35] text-white font-bold py-3 px-4 rounded-lg shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2">
+                        <span>Entrar</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </form>
+
+                <div class="relative my-6">
+                    <div class="absolute inset-0 flex items-center">
+                        <div class="w-full border-t border-slate-200"></div>
+                    </div>
+                    <div class="relative flex justify-center text-sm">
+                        <span class="px-2 bg-white text-slate-500">Ou continue com</span>
+                    </div>
+                </div>
+
+                <button type="button" id="btn-google" class="w-full bg-white border border-slate-300 text-slate-700 font-semibold py-2.5 px-4 rounded-lg hover:bg-slate-50 transition duration-200 flex items-center justify-center gap-2 shadow-sm">
+                    <i class="fa-brands fa-google text-red-500"></i>
+                    <span>Google Acadêmico</span>
+                </button>
+            </div>
+
+            <div class="bg-slate-50 px-8 py-4 border-t border-slate-100 text-center">
+                <p class="text-sm text-slate-600">
+                    Ainda não tem conta? 
+                    <a href="cadastro.html" class="text-[#002d5c] font-bold hover:text-[#008542] transition">Cadastre-se</a>
+                </p>
+            </div>
+        </div>
+
+        <p class="text-center text-white/60 text-xs mt-6">
+            &copy; 2025 Univille - Desenvolvimento Web Grupo 05
+        </p>
+
+    </main>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+
+        // --- CONFIGURAÇÃO DO FIREBASE ---
+        // SUBSTITUA COM SUAS CREDENCIAIS DO CONSOLE FIREBASE
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBkod_3W8rWTxEHe7C6fEjzs46LokAhVU",
+            authDomain: "trabalho-dew-bd026.firebaseapp.com",
+            projectId: "trabalho-dew-bd026",
+            storageBucket: "trabalho-dew-bd026.firebasestorage.app",
+            messagingSenderId: "532853365174",
+            appId: "1:532853365174:web:06b7539419538380c6c917",
+            measurementId: "G-GX5KXSP4SL"
+        };
+
+        // Inicializa o Firebase apenas se a config tiver sido preenchida (checagem básica)
+        let app, auth;
+        if (firebaseConfig.apiKey !== "SUA_API_KEY_AQUI") {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+        } else {
+            console.warn("Firebase não configurado! Preencha a const firebaseConfig no código.");
+        }
+
+        // Login com Email/Senha
+        window.handleLogin = async (e) => {
+            e.preventDefault();
+            
+            if (!auth) {
+                showToast("Erro: Configure as chaves do Firebase no código!", "error");
+                return;
+            }
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('btn-login');
+            const originalText = btn.innerHTML;
+
+            btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Entrando...';
+            btn.disabled = true;
+            btn.classList.add('opacity-75', 'cursor-not-allowed');
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                window.location.href = 'dashboard.html'; 
+            } catch (error) {
+                console.error("Erro Login:", error.code, error.message);
+                let msg = "Falha ao entrar. Verifique suas credenciais.";
+                if (error.code === 'auth/invalid-credential') msg = "E-mail ou senha incorretos.";
+                if (error.code === 'auth/too-many-requests') msg = "Muitas tentativas. Tente mais tarde.";
+                showToast(msg, "error");
+            } finally {
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                btn.classList.remove('opacity-75', 'cursor-not-allowed');
+            }
+        };
+
+        // Login com Google
+        document.getElementById('btn-google').addEventListener('click', async () => {
+            if (!auth) {
+                showToast("Erro: Configure as chaves do Firebase no código!", "error");
+                return;
+            }
+
+            try {
+                const provider = new GoogleAuthProvider();
+                await signInWithPopup(auth, provider);
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                console.error("Erro Google:", error);
+                showToast("Erro ao conectar com Google.", "error");
+            }
+        });
+
+        // Toggle Senha
+        window.togglePassword = () => {
+            const input = document.getElementById('password');
+            const icon = document.getElementById('eye-icon');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        };
+
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            const bgColor = type === 'success' ? 'bg-[#002d5c]' : 'bg-red-600';
+            toast.className = `fixed top-4 right-4 px-6 py-3 rounded-lg text-white shadow-lg fade-in z-50 ${bgColor} flex items-center gap-3`;
+            toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-triangle-exclamation'}"></i> ${message}`;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
