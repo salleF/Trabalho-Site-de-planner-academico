@@ -80,11 +80,22 @@
                     </div>
 
                     <!-- Senha -->
-                    <div class="mb-6">
+                    <div class="mb-4">
                         <label class="block text-slate-700 text-sm font-bold mb-2">Senha</label>
                         <input type="password" id="password" 
                             class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[#008542] bg-slate-50" 
                             placeholder="••••••••" required minlength="6">
+                    </div>
+
+                    <!-- Solicitação de Professor -->
+                    <div class="mb-6 flex items-start gap-3 p-3 bg-blue-50 border border-blue-100 rounded-lg transition-colors hover:bg-blue-100">
+                        <div class="flex h-5 items-center">
+                            <input id="request-professor" type="checkbox" class="w-4 h-4 text-[#008542] border-gray-300 rounded focus:ring-[#008542] cursor-pointer">
+                        </div>
+                        <div class="text-sm">
+                            <label for="request-professor" class="font-medium text-slate-700 select-none cursor-pointer">Solicitar acesso como Professor?</label>
+                            <p class="text-slate-500 text-xs">Sua conta será criada como Aluno até aprovação da coordenação.</p>
+                        </div>
                     </div>
 
                     <button type="submit" id="btn-signup"
@@ -161,6 +172,7 @@
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
+            const requestProfessor = document.getElementById('request-professor').checked; // Pega o valor do checkbox
             const fullDiscordTag = `${username}#${userTag}`;
 
             if(!username) return showToast("Escolha um nome de usuário", "error");
@@ -207,6 +219,8 @@
                     discriminator: userTag.toString(),
                     fullTag: fullDiscordTag,
                     photoURL: photoURL,
+                    isProfessor: false, // Por padrão, todo mundo é aluno. Os devs mudam depois.
+                    requestedProfessorAccess: requestProfessor, // Indica se o usuário pediu acesso como professor
                     createdAt: new Date(),
                     storagePath: selectedFile ? `profile_photos/${user.uid}` : null // Útil se quiser apagar depois
                 });
