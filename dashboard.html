@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Academic Planner - Univille (LMS Editável)</title>
+    <title>Academic Planner - Painel Oficial</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -29,9 +29,33 @@
         .timeline-section { position: relative; padding-left: 24px; border-left: 2px solid #e2e8f0; margin-left: 12px; }
         .chevron-icon { transition: transform 0.3s ease; }
         .rotate-180 { transform: rotate(180deg); }
+        
+        #loading-screen {
+            position: fixed; inset: 0; background: white; z-index: 100;
+            display: flex; align-items: center; justify-content: center; flex-direction: column;
+        }
+        
+        .role-btn-active {
+            background-color: #008542;
+            color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        .role-btn-inactive {
+            color: #cbd5e1; /* Cinza claro */
+            background-color: transparent;
+        }
+        .role-btn-inactive:hover {
+            color: white;
+            background-color: rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body class="text-slate-800">
+
+    <div id="loading-screen">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-[#008542]"></div>
+        <p class="mt-4 text-slate-500 font-medium">Carregando sistema...</p>
+    </div>
 
     <nav class="bg-[#083f0c] text-white shadow-lg sticky top-0 z-50 border-b-4 border-[#008542]">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -42,28 +66,40 @@
                     </div>
                     <div>
                         <span class="font-bold text-lg tracking-tight block leading-none">Univille</span>
-                        <span class="text-[#4caf50] text-xs font-light uppercase tracking-wider">Ambiente Virtual</span>
+                        <span class="text-[#4caf50] text-xs font-light uppercase tracking-wider">LMS V2.0</span>
                     </div>
                 </div>
                 
-                <div class="flex items-center bg-[#002d5c] rounded-lg p-1 border border-white/10 shadow-inner">
-                    <button onclick="window.switchRole('professor')" id="btn-role-prof" class="px-4 py-1.5 text-xs font-bold rounded-md transition bg-[#008542] text-white shadow">Professor</button>
-                    <button onclick="window.switchRole('student')" id="btn-role-student" class="px-4 py-1.5 text-xs font-bold rounded-md transition text-slate-300 hover:text-white">Aluno</button>
+                <div class="flex items-center gap-4">
+                    <button id="btn-requests" onclick="window.openRequestsModal()" class="hidden relative p-2 rounded-full hover:bg-white/10 transition text-yellow-400">
+                        <i class="fa-solid fa-bell text-xl"></i>
+                        <span id="requests-badge" class="absolute top-0 right-0 block h-3 w-3 rounded-full ring-2 ring-[#083f0c] bg-red-600 hidden"></span>
+                    </button>
+
+                    <div id="role-switcher" class="hidden flex items-center bg-[#002d5c] rounded-lg p-1 border border-white/10 shadow-inner">
+                        <button onclick="window.switchRole('professor')" id="btn-role-prof" class="px-4 py-1.5 text-xs font-bold rounded-md transition duration-200">Professor</button>
+                        <button onclick="window.switchRole('student')" id="btn-role-student" class="px-4 py-1.5 text-xs font-bold rounded-md transition duration-200">Aluno</button>
+                    </div>
+                    
+                    <button id="btn-logout" class="text-white/80 hover:text-white text-sm font-medium hover:bg-white/10 px-3 py-1 rounded transition">
+                        <i class="fa-solid fa-right-from-bracket"></i> Sair
+                    </button>
                 </div>
             </div>
         </div>
     </nav>
 
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 border-b border-slate-200 pb-6">
             <div>
                 <span class="text-[#008542] font-bold text-sm uppercase tracking-wide mb-1 block">Disciplina</span>
-                <h1 class="text-3xl font-extrabold text-[#002d5c]" id="page-title">Desenvolvimento Web</h1>
-                <p class="text-slate-500 mt-1" id="page-subtitle">Prof. Exemplo | 2025/1</p>
+                <h1 class="text-3xl font-extrabold text-[#002d5c]" id="page-title">Carregando...</h1>
+                <p class="text-slate-500 mt-1">
+                    Bem-vindo, <span id="user-name-display" class="font-bold">...</span>
+                    <span id="mode-badge" class="ml-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded border"></span>
+                </p>
             </div>
-            
-            <button id="btn-create" onclick="window.openModal('create')" class="bg-[#008542] hover:bg-[#006b35] text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-200 flex items-center gap-2">
+            <button id="btn-create" onclick="window.openModal('create')" class="hidden bg-[#008542] hover:bg-[#006b35] text-white font-semibold py-2.5 px-6 rounded-lg shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition duration-200 flex items-center gap-2">
                 <i class="fa-solid fa-plus"></i> Adicionar Conteúdo
             </button>
         </div>
@@ -74,7 +110,6 @@
                 <button onclick="window.filterTasks('activity')" class="filter-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-1.5 rounded-lg text-sm font-medium transition" data-type="activity">Atividades</button>
                 <button onclick="window.filterTasks('material')" class="filter-btn bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-1.5 rounded-lg text-sm font-medium transition" data-type="material">Materiais</button>
             </div>
-            
             <div class="flex items-center gap-3 w-full md:w-auto bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
                 <i class="fa-regular fa-calendar text-slate-400"></i>
                 <input type="date" id="date-filter" onchange="window.renderTasks()" class="bg-transparent text-sm outline-none text-slate-600 w-full md:w-auto">
@@ -82,31 +117,23 @@
             </div>
         </div>
 
-        <div id="content-container" class="space-y-6">
-            </div>
-        
+        <div id="content-container" class="space-y-6"></div>
         <div id="empty-state" class="hidden text-center py-16">
-            <div class="bg-slate-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-layer-group text-4xl text-slate-300"></i>
-            </div>
+            <div class="bg-slate-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-layer-group text-4xl text-slate-300"></i></div>
             <h3 class="text-lg font-bold text-slate-600">Nenhum conteúdo publicado</h3>
         </div>
-
     </main>
 
     <div id="universal-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
         <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
             <div class="fixed inset-0 bg-[#002d5c] bg-opacity-60 transition-opacity backdrop-blur-sm" onclick="window.closeModal()"></div>
             <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
-
             <div class="inline-block align-middle bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-2xl w-full">
                 <div class="bg-[#008542] px-6 py-4 flex justify-between items-center">
                     <h3 class="text-xl font-bold text-white flex items-center gap-2" id="modal-title">Novo Conteúdo</h3>
                     <button onclick="window.closeModal()" class="text-white/80 hover:text-white transition"><i class="fa-solid fa-times text-xl"></i></button>
                 </div>
-                
                 <div class="bg-white px-6 py-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
-                    
                     <form id="task-form">
                         <input type="hidden" id="task-id">
                         
@@ -126,14 +153,10 @@
                                     <div>
                                         <label class="block text-slate-700 text-sm font-bold mb-2">Aula / Tópico</label>
                                         <input id="lesson" type="text" list="lesson-suggestions" class="w-full border border-slate-300 rounded-lg py-2.5 px-3" placeholder="Ex: Aula 01 - Introdução">
-                                        <datalist id="lesson-suggestions">
-                                            <option value="Aula 01 - Introdução">
-                                            <option value="Aula 02 - Fundamentos">
-                                        </datalist>
+                                        <datalist id="lesson-suggestions"><option value="Aula 01 - Introdução"><option value="Aula 02 - Fundamentos"></datalist>
                                     </div>
                                 </div>
                             </div>
-                            
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div class="md:col-span-2">
                                     <label class="block text-slate-700 text-sm font-bold mb-2">Título</label>
@@ -147,12 +170,10 @@
                                     </select>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-slate-700 text-sm font-bold mb-2">Descrição</label>
                                 <textarea id="description" rows="3" class="w-full border border-slate-300 rounded-lg py-2.5 px-3"></textarea>
                             </div>
-
                             <div id="activity-settings" class="hidden bg-green-50 p-4 rounded-xl border border-green-200">
                                 <div class="grid grid-cols-2 gap-4">
                                     <div><label class="block text-slate-700 text-sm font-bold mb-2">Nota Máxima</label><input id="max-grade" type="number" class="w-full border border-slate-300 rounded-lg py-2 px-3" placeholder="10.0"></div>
@@ -163,7 +184,6 @@
                                     <label class="flex items-center text-sm font-medium text-slate-700"><input type="checkbox" id="allow-file" checked class="mr-2 text-[#008542]"> Permitir Arquivo</label>
                                 </div>
                             </div>
-
                             <div>
                                 <label class="block text-slate-700 text-sm font-bold mb-2">Anexar Arquivo</label>
                                 <div class="file-upload-wrapper relative group">
@@ -175,7 +195,6 @@
                         </div>
 
                         <div id="student-fields" class="hidden space-y-6">
-                            
                             <div id="student-feedback-display" class="hidden bg-amber-50 border border-amber-200 rounded-xl p-5 shadow-sm">
                                 <div class="flex justify-between items-start mb-2">
                                     <h4 class="text-amber-900 font-bold flex items-center gap-2"><i class="fa-solid fa-check-double"></i> Correção Realizada</h4>
@@ -183,20 +202,17 @@
                                 </div>
                                 <p class="text-amber-800 text-sm italic" id="feedback-text-content">"Excelente trabalho..."</p>
                             </div>
-
                             <div id="prof-attachment-display" class="hidden bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-center justify-between">
                                 <div class="flex items-center gap-3">
                                     <div class="bg-blue-100 text-blue-600 w-10 h-10 rounded-lg flex items-center justify-center"><i class="fa-solid fa-file-pdf text-xl"></i></div>
                                     <div><p class="text-sm font-bold text-blue-900">Material de Apoio</p><p class="text-xs text-blue-700" id="prof-attachment-name">arquivo.pdf</p></div>
                                 </div>
-                                <button type="button" class="text-blue-600 font-bold text-sm">Baixar</button>
+                                <a id="btn-download-attachment" href="#" target="_blank" class="text-blue-600 font-bold text-sm hover:underline">Baixar <i class="fa-solid fa-download"></i></a>
                             </div>
-
                             <div id="student-text-area-container">
                                 <label class="block text-slate-700 text-sm font-bold mb-2">Sua Resposta</label>
                                 <textarea id="student-answer" rows="5" class="w-full border border-slate-300 rounded-lg py-3 px-4 bg-slate-50" placeholder="Escreva sua resposta aqui..."></textarea>
                             </div>
-
                             <div id="student-file-container">
                                 <label class="block text-slate-700 text-sm font-bold mb-2">Anexar Trabalho</label>
                                 <div class="file-upload-wrapper relative group">
@@ -231,31 +247,134 @@
         </div>
     </div>
 
-    <script>
-        const STORAGE_KEY = 'univille_lms_v6_editable';
-        let tasks = [];
-        let currentRole = 'professor';
-        let currentFilter = 'all';
-        const CURRENT_STUDENT_NAME = "Você (Aluno)";
-        let expandedSections = new Set();
+    <div id="requests-modal" class="fixed inset-0 z-[70] hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-[#002d5c] bg-opacity-60 transition-opacity backdrop-blur-sm" onclick="document.getElementById('requests-modal').classList.add('hidden')"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-middle bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-xl w-full">
+                <div class="bg-yellow-500 px-6 py-4 flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-user-shield"></i> Pedidos de Acesso</h3>
+                    <button onclick="document.getElementById('requests-modal').classList.add('hidden')" class="text-white/80 hover:text-white transition"><i class="fa-solid fa-times text-xl"></i></button>
+                </div>
+                <div class="p-6">
+                    <div class="overflow-hidden rounded-lg border border-slate-200">
+                        <table class="min-w-full divide-y divide-slate-200">
+                            <thead class="bg-slate-50">
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Usuário</th>
+                                    <th class="px-4 py-3 text-left text-xs font-bold text-slate-500 uppercase">Email</th>
+                                    <th class="px-4 py-3 text-right text-xs font-bold text-slate-500 uppercase">Ação</th>
+                                </tr>
+                            </thead>
+                            <tbody id="requests-list" class="bg-white divide-y divide-slate-200"></tbody>
+                        </table>
+                        <div id="no-requests-msg" class="hidden p-8 text-center text-slate-400">Nenhum pedido pendente.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        function loadTasks() {
-            const data = localStorage.getItem(STORAGE_KEY);
-            if (data) {
-                tasks = JSON.parse(data);
-            } else {
-                tasks = [
-                    { id: '1', quarter: '1º Bimestre', lesson: 'Aula 01 - Introdução', type: 'material', title: 'Slides de Apresentação', description: 'Conceitos básicos.', profAttachment: 'slide_intro.pdf', submissions: [] },
-                    { id: '2', quarter: '1º Bimestre', lesson: 'Aula 02 - HTML5', type: 'activity', title: 'Exercício 1', description: 'Estrutura básica.', date: '2025-03-10', maxGrade: '10', allowText: true, allowFile: true, submissions: [{ studentName: CURRENT_STUDENT_NAME, text: 'Minha resposta...', file: null, grade: '9.5', feedback: 'Muito bom!' }] }
-                ];
-                saveTasks();
-            }
-            const firstQ = tasks.length > 0 ? tasks[0].quarter : null;
-            if(firstQ) expandedSections.add(firstQ);
-            renderTasks();
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, doc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBBkod_3W8rWTxEHe7C6fEjzs46LokAhVU",
+            authDomain: "trabalho-dew-bd026.firebaseapp.com",
+            projectId: "trabalho-dew-bd026",
+            storageBucket: "trabalho-dew-bd026.firebasestorage.app",
+            messagingSenderId: "532853365174",
+            appId: "1:532853365174:web:06b7539419538380c6c917",
+            measurementId: "G-GX5KXSP4SL"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        let tasks = [];
+        let currentRole = 'student'; 
+        let currentFilter = 'all';
+        let expandedSections = new Set();
+        let currentUser = null; 
+
+        onAuthStateChanged(auth, async (user) => {
+            const loadingScreen = document.getElementById('loading-screen');
+            if (user) {
+                try {
+                    const userDoc = await getDoc(doc(db, "users", user.uid));
+                    if (userDoc.exists()) {
+                        currentUser = userDoc.data();
+                        document.getElementById('user-name-display').textContent = currentUser.username || user.email;
+                        if (currentUser.isProfessor === true) {
+                            document.getElementById('role-switcher').classList.remove('hidden'); 
+                            document.getElementById('btn-requests').classList.remove('hidden');
+                            window.switchRole('professor'); 
+                            checkRequests(); 
+                        } else {
+                            document.getElementById('role-switcher').classList.add('hidden'); 
+                            document.getElementById('btn-requests').classList.add('hidden');
+                            window.switchRole('student'); 
+                        }
+                    } else { await signOut(auth); window.location.href = 'login.html'; }
+                } catch (error) { console.error("Erro auth:", error); } finally { loadingScreen.style.display = 'none'; }
+            } else { window.location.href = 'login.html'; }
+        });
+
+        document.getElementById('btn-logout').addEventListener('click', () => { signOut(auth).then(() => window.location.href = 'login.html'); });
+
+        async function checkRequests() {
+            if(!currentUser.isProfessor) return;
+            const q = query(collection(db, "users"), where("requestedProfessorAccess", "==", true));
+            const snapshot = await getDocs(q);
+            const badge = document.getElementById('requests-badge');
+            if (!snapshot.empty) badge.classList.remove('hidden'); else badge.classList.add('hidden');
         }
 
-        function saveTasks() { localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks)); renderTasks(); }
+        window.openRequestsModal = async () => {
+            const modal = document.getElementById('requests-modal');
+            const tbody = document.getElementById('requests-list');
+            const noMsg = document.getElementById('no-requests-msg');
+            tbody.innerHTML = '<tr><td colspan="3" class="p-4 text-center"><i class="fa-solid fa-spinner fa-spin"></i> Carregando...</td></tr>';
+            modal.classList.remove('hidden');
+            const q = query(collection(db, "users"), where("requestedProfessorAccess", "==", true));
+            const snapshot = await getDocs(q);
+            tbody.innerHTML = '';
+            if (snapshot.empty) { noMsg.classList.remove('hidden'); } else {
+                noMsg.classList.add('hidden');
+                snapshot.forEach(docSnap => {
+                    const u = docSnap.data();
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `<td class="px-4 py-3 whitespace-nowrap text-sm font-medium text-slate-900">${u.username || 'Sem nome'}</td><td class="px-4 py-3 whitespace-nowrap text-sm text-slate-500">${u.email}</td><td class="px-4 py-3 whitespace-nowrap text-right text-sm font-medium"><button onclick="window.handleRequest('${u.uid}', 'approve')" class="text-green-600 hover:text-green-900 mr-3"><i class="fa-solid fa-check"></i> Aprovar</button><button onclick="window.handleRequest('${u.uid}', 'deny')" class="text-red-600 hover:text-red-900"><i class="fa-solid fa-times"></i> Recusar</button></td>`;
+                    tbody.appendChild(tr);
+                });
+            }
+        };
+
+        window.handleRequest = async (targetUid, action) => {
+            if(!confirm(`Tem certeza?`)) return;
+            try {
+                const userRef = doc(db, "users", targetUid);
+                if (action === 'approve') await updateDoc(userRef, { isProfessor: true, requestedProfessorAccess: false });
+                else await updateDoc(userRef, { requestedProfessorAccess: false });
+                window.openRequestsModal(); checkRequests();
+            } catch (error) { alert("Erro: " + error.message); }
+        };
+
+        async function loadTasks() {
+            tasks = [];
+            try {
+                const q = query(collection(db, "conteudos"));
+                const querySnapshot = await getDocs(q);
+                querySnapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
+                if (tasks.length > 0) expandedSections.add(tasks[0].quarter);
+                renderTasks();
+            } catch (error) { console.error("Erro tarefas:", error); }
+        }
 
         window.renderTasks = () => {
             const container = document.getElementById('content-container');
@@ -273,32 +392,24 @@
 
             const groupedByQuarter = filtered.reduce((acc, task) => {
                 const key = task.quarter || 'Geral';
-                if (!acc[key]) acc[key] = [];
-                acc[key].push(task);
-                return acc;
+                if (!acc[key]) acc[key] = []; acc[key].push(task); return acc;
             }, {});
 
             Object.keys(groupedByQuarter).sort().forEach(quarter => {
                 const isExpanded = expandedSections.has(quarter);
                 const quarterWrapper = document.createElement('div');
                 quarterWrapper.className = "bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden";
-                
                 const header = document.createElement('div');
                 header.className = "flex items-center justify-between p-5 cursor-pointer bg-slate-50 hover:bg-slate-100 transition select-none border-b border-slate-100";
                 header.onclick = () => window.toggleSection(quarter);
                 header.innerHTML = `<div class="flex items-center gap-3"><div class="w-2 h-8 bg-[#002d5c] rounded-full"></div><h2 class="text-xl font-bold text-[#002d5c]">${quarter}</h2><span class="text-xs font-semibold bg-slate-200 text-slate-600 px-2 py-0.5 rounded-full">${groupedByQuarter[quarter].length} itens</span></div><i class="fa-solid fa-chevron-down text-slate-400 chevron-icon ${isExpanded ? 'rotate-180' : ''}"></i>`;
-
                 const content = document.createElement('div');
                 content.className = isExpanded ? "p-5 block fade-in" : "hidden";
-                
                 const tasksInQuarter = groupedByQuarter[quarter];
                 tasksInQuarter.sort((a, b) => (a.lesson || '').localeCompare(b.lesson || ''));
-
                 const groupedByLesson = tasksInQuarter.reduce((acc, task) => {
                     const key = task.lesson || 'Extras';
-                    if (!acc[key]) acc[key] = [];
-                    acc[key].push(task);
-                    return acc;
+                    if (!acc[key]) acc[key] = []; acc[key].push(task); return acc;
                 }, {});
 
                 Object.keys(groupedByLesson).sort().forEach(lesson => {
@@ -311,14 +422,37 @@
                     lessonBlock.appendChild(cardsDiv);
                     content.appendChild(lessonBlock);
                 });
-
-                quarterWrapper.appendChild(header);
-                quarterWrapper.appendChild(content);
-                container.appendChild(quarterWrapper);
+                quarterWrapper.appendChild(header); quarterWrapper.appendChild(content); container.appendChild(quarterWrapper);
             });
         };
 
+        window.switchRole = (role) => {
+            currentRole = role;
+            document.getElementById('page-title').textContent = role === 'professor' ? "Painel do Professor" : "Área do Aluno";
+            
+            const btnCreate = document.getElementById('btn-create');
+            const btnProf = document.getElementById('btn-role-prof');
+            const btnStud = document.getElementById('btn-role-student');
+            const badge = document.getElementById('mode-badge');
+
+            if (role === 'professor') {
+                btnCreate.classList.remove('hidden');
+                btnProf.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-active";
+                btnStud.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-inactive";
+                badge.textContent = "Modo Professor";
+                badge.className = "ml-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded border bg-green-100 text-green-800 border-green-200";
+            } else {
+                btnCreate.classList.add('hidden');
+                btnStud.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-active";
+                btnProf.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-inactive";
+                badge.textContent = "Modo Aluno";
+                badge.className = "ml-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded border bg-slate-100 text-slate-600 border-slate-200";
+            }
+            renderTasks();
+        };
+
         window.toggleSection = (quarterName) => { if (expandedSections.has(quarterName)) expandedSections.delete(quarterName); else expandedSections.add(quarterName); renderTasks(); };
+        window.filterTasks = (type) => { currentFilter = type; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active', 'bg-[#002d5c]', 'text-white')); document.querySelectorAll('.filter-btn').forEach(b => { if(b.dataset.type === type) b.classList.add('active', 'bg-[#002d5c]', 'text-white'); else b.classList.add('bg-slate-100', 'text-slate-600') }); renderTasks(); };
 
         function createTaskCard(task) {
             const isProf = currentRole === 'professor';
@@ -326,6 +460,15 @@
             const icon = isActivity ? '<i class="fa-solid fa-clipboard-check text-green-600"></i>' : '<i class="fa-solid fa-book-open text-blue-600"></i>';
             const borderClass = isActivity ? 'border-l-green-500' : 'border-l-blue-400';
             const dateDisplay = task.date ? `<div class="text-xs text-slate-500 mt-2 font-medium bg-slate-50 inline-block px-2 py-1 rounded"><i class="fa-regular fa-clock"></i> Entrega: ${new Date(task.date).toLocaleDateString('pt-BR')}</div>` : '';
+            
+            let attachmentHtml = '';
+            if (task.profAttachment) {
+                if (task.profAttachmentUrl) {
+                    attachmentHtml = `<div class="text-xs mb-2 font-medium flex items-center gap-1"><i class="fa-solid fa-paperclip text-blue-600"></i> <a href="${task.profAttachmentUrl}" target="_blank" class="text-blue-600 hover:underline cursor-pointer">${task.profAttachment}</a></div>`;
+                } else {
+                    attachmentHtml = `<div class="text-xs text-slate-400 mb-2 font-medium flex items-center gap-1"><i class="fa-solid fa-paperclip"></i> ${task.profAttachment} (Sem link)</div>`;
+                }
+            }
 
             let footerActions = '';
             let feedbackHtml = '';
@@ -333,20 +476,11 @@
             if (isProf) {
                 const subCount = task.submissions ? task.submissions.length : 0;
                 let gradeBtn = isActivity ? `<button onclick="window.openModal('grade', '${task.id}')" class="text-blue-600 hover:bg-blue-50 px-3 py-1.5 rounded text-sm font-bold transition flex items-center gap-2"><i class="fa-solid fa-users-viewfinder"></i> Entregas <span class="bg-blue-100 text-blue-800 text-xs px-1.5 rounded-full">${subCount}</span></button>` : '';
-                
-                // Botões de Professor (Editar e Excluir)
-                footerActions = `
-                    <div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center">
-                        <div class="flex gap-2">
-                            <button onclick="window.deleteTask('${task.id}')" class="text-slate-400 hover:text-red-500 text-sm p-1" title="Excluir"><i class="fa-solid fa-trash"></i></button>
-                            <button onclick="window.openModal('edit', '${task.id}')" class="text-slate-400 hover:text-[#002d5c] text-sm p-1" title="Editar"><i class="fa-solid fa-pen"></i></button>
-                        </div>
-                        ${gradeBtn}
-                    </div>
-                `;
+                footerActions = `<div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center"><div class="flex gap-2"><button onclick="window.deleteTask('${task.id}')" class="text-slate-400 hover:text-red-500 text-sm p-1" title="Excluir"><i class="fa-solid fa-trash"></i></button><button onclick="window.openModal('edit', '${task.id}')" class="text-slate-400 hover:text-[#002d5c] text-sm p-1" title="Editar"><i class="fa-solid fa-pen"></i></button></div>${gradeBtn}</div>`;
             } else {
+                const studentName = currentUser ? currentUser.username : "Você (Aluno)";
                 if (isActivity) {
-                    const mySub = task.submissions ? task.submissions.find(s => s.studentName === CURRENT_STUDENT_NAME) : null;
+                    const mySub = task.submissions ? task.submissions.find(s => s.studentName === studentName) : null;
                     if (mySub && mySub.feedback) feedbackHtml = `<div class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3 text-xs text-amber-900 shadow-sm"><span class="font-bold flex items-center gap-1 mb-1 text-amber-700"><i class="fa-regular fa-comment-dots"></i> Feedback:</span>"${mySub.feedback}"</div>`;
                     if (mySub) {
                         const grade = mySub.grade ? `<span class="text-[#002d5c] font-bold">Nota: ${mySub.grade}</span>` : '<span class="text-slate-400 italic">Em correção</span>';
@@ -355,13 +489,16 @@
                         footerActions = `<div class="mt-4 pt-3 border-t border-slate-100 flex justify-between items-center"><span class="text-xs font-bold text-slate-400">Vale ${task.maxGrade} pts</span><button onclick="window.openModal('submit', '${task.id}')" class="bg-[#002d5c] hover:bg-[#001a36] text-white px-4 py-1.5 rounded text-sm font-bold shadow-sm">Entregar</button></div>`;
                     }
                 } else {
-                    footerActions = `<div class="mt-4 pt-3 border-t border-slate-100 flex justify-end"><button class="text-[#008542] hover:text-[#006b35] text-sm font-bold flex items-center gap-1">Acessar <i class="fa-solid fa-arrow-right"></i></button></div>`;
+                    if(task.profAttachmentUrl) {
+                        footerActions = `<div class="mt-4 pt-3 border-t border-slate-100 flex justify-end"><a href="${task.profAttachmentUrl}" target="_blank" class="text-[#008542] hover:text-[#006b35] text-sm font-bold flex items-center gap-1">Acessar <i class="fa-solid fa-arrow-right"></i></a></div>`;
+                    } else {
+                        footerActions = `<div class="mt-4 pt-3 border-t border-slate-100 flex justify-end"><button class="text-slate-400 text-sm font-bold flex items-center gap-1 cursor-not-allowed">Sem anexo</button></div>`;
+                    }
                 }
             }
-
             const card = document.createElement('div');
             card.className = `bg-white rounded-lg shadow-sm border border-slate-200 p-5 hover:shadow-md transition duration-200 flex flex-col justify-between border-l-4 ${borderClass}`;
-            card.innerHTML = `<div><div class="flex items-start justify-between mb-2"><h3 class="font-bold text-lg text-slate-800 leading-tight">${task.title}</h3><div class="bg-slate-50 p-2 rounded-lg text-lg">${icon}</div></div><p class="text-sm text-slate-600 mb-3">${task.description || ''}</p>${task.profAttachment ? `<div class="text-xs text-blue-600 mb-2 font-medium flex items-center gap-1"><i class="fa-solid fa-paperclip"></i> ${task.profAttachment}</div>` : ''}${dateDisplay}${feedbackHtml}</div>${footerActions}`;
+            card.innerHTML = `<div><div class="flex items-start justify-between mb-2"><h3 class="font-bold text-lg text-slate-800 leading-tight">${task.title}</h3><div class="bg-slate-50 p-2 rounded-lg text-lg">${icon}</div></div><p class="text-sm text-slate-600 mb-3">${task.description || ''}</p>${attachmentHtml}${dateDisplay}${feedbackHtml}</div>${footerActions}`;
             return card;
         }
 
@@ -394,12 +531,9 @@
                 title.innerHTML = '<i class="fa-solid fa-plus"></i> Novo Conteúdo';
                 window.toggleGradeField();
             } else if (mode === 'edit') {
-                // MODO EDIÇÃO
                 profFields.classList.remove('hidden');
                 title.innerHTML = '<i class="fa-solid fa-pen"></i> Editar Conteúdo';
-                editNotice.classList.remove('hidden'); // Avisa que se não subir arquivo, mantém o antigo
-                
-                // Preencher dados
+                editNotice.classList.remove('hidden');
                 const task = tasks.find(t => t.id === id);
                 document.getElementById('quarter').value = task.quarter;
                 document.getElementById('lesson').value = task.lesson;
@@ -417,7 +551,6 @@
                     document.getElementById('prof-file-name').classList.add('text-blue-600', 'font-bold');
                 }
                 window.toggleGradeField();
-
             } else if (mode === 'submit') {
                 studFields.classList.remove('hidden');
                 title.innerHTML = '<i class="fa-solid fa-upload"></i> Detalhes da Entrega';
@@ -425,12 +558,19 @@
                 if(task.profAttachment) {
                     document.getElementById('prof-attachment-display').classList.remove('hidden');
                     document.getElementById('prof-attachment-name').textContent = task.profAttachment;
+                    const btnDown = document.getElementById('btn-download-attachment');
+                    if (task.profAttachmentUrl) {
+                        btnDown.href = task.profAttachmentUrl;
+                        btnDown.classList.remove('hidden');
+                    } else {
+                        btnDown.classList.add('hidden');
+                    }
                 } else { document.getElementById('prof-attachment-display').classList.add('hidden'); }
                 
                 document.getElementById('student-text-area-container').style.display = task.allowText ? 'block' : 'none';
                 document.getElementById('student-file-container').style.display = task.allowFile ? 'block' : 'none';
-
-                const mySub = task.submissions ? task.submissions.find(s => s.studentName === CURRENT_STUDENT_NAME) : null;
+                const studentName = currentUser ? currentUser.username : "Você (Aluno)";
+                const mySub = task.submissions ? task.submissions.find(s => s.studentName === studentName) : null;
                 if (mySub) {
                     document.getElementById('student-answer').value = mySub.text || '';
                     if(mySub.file) document.getElementById('student-file-name').textContent = mySub.file;
@@ -449,7 +589,6 @@
         };
 
         window.closeModal = () => document.getElementById('universal-modal').classList.add('hidden');
-        window.switchRole = (role) => { currentRole = role; document.getElementById('page-title').textContent = role === 'professor' ? "Painel do Professor" : "Área do Aluno"; renderTasks(); };
         window.toggleGradeField = () => { document.getElementById('activity-settings').classList.toggle('hidden', document.getElementById('type').value !== 'activity'); };
         window.updateFileName = (inputId, displayId) => { const i = document.getElementById(inputId); if(i.files[0]) document.getElementById(displayId).textContent = i.files[0].name; };
 
@@ -458,74 +597,157 @@
             const tbody = document.getElementById('submissions-list');
             tbody.innerHTML = '';
             if(!task.submissions || task.submissions.length === 0) { tbody.innerHTML = '<tr><td colspan="3" class="px-6 py-8 text-center text-slate-400">Nenhuma entrega.</td></tr>'; return; }
+            
             task.submissions.forEach((sub, index) => {
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="px-6 py-4"><div class="font-bold text-slate-700">${sub.studentName}</div></td><td class="px-6 py-4">${sub.text || ''} ${sub.file ? `(Arquivo: ${sub.file})` : ''}</td><td class="px-6 py-4"><div class="flex gap-2 mb-2"><input type="text" id="grade-${index}" value="${sub.grade || ''}" class="w-16 border rounded text-center"><button onclick="saveGrade('${taskId}', ${index})" class="bg-green-600 text-white px-2 rounded text-xs">OK</button></div><textarea id="feedback-${index}" class="w-full border rounded text-xs p-1">${sub.feedback || ''}</textarea></td>`;
+                
+                let fileDisplay = '';
+                if (sub.file) {
+                    if (sub.fileUrl) {
+                        fileDisplay = `<a href="${sub.fileUrl}" target="_blank" class="text-blue-600 hover:underline flex items-center gap-1"><i class="fa-solid fa-file-arrow-down"></i> ${sub.file}</a>`;
+                    } else {
+                        fileDisplay = `<span class="text-slate-500 text-xs">(Arquivo: ${sub.file} - Sem link)</span>`;
+                    }
+                }
+
+                tr.innerHTML = `
+                    <td class="px-6 py-4"><div class="font-bold text-slate-700">${sub.studentName}</div></td>
+                    <td class="px-6 py-4">
+                        <div class="text-sm text-slate-600 mb-1">${sub.text || 'Sem texto'}</div>
+                        ${fileDisplay}
+                    </td>
+                    <td class="px-6 py-4">
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" id="grade-${index}" value="${sub.grade || ''}" class="w-16 border rounded text-center focus:ring-2 focus:ring-[#008542] outline-none" placeholder="0.0">
+                            <button onclick="saveGrade('${taskId}', ${index})" class="bg-[#008542] hover:bg-[#006b35] text-white px-2 rounded text-xs font-bold transition">OK</button>
+                        </div>
+                        <textarea id="feedback-${index}" class="w-full border rounded text-xs p-2 focus:ring-1 focus:ring-[#008542] outline-none" placeholder="Escreva um feedback...">${sub.feedback || ''}</textarea>
+                    </td>`;
                 tbody.appendChild(tr);
             });
         }
 
-        window.saveGrade = (taskId, index) => {
+        window.saveGrade = async (taskId, index) => {
             const tIdx = tasks.findIndex(t => t.id === taskId);
-            tasks[tIdx].submissions[index].grade = document.getElementById(`grade-${index}`).value;
-            tasks[tIdx].submissions[index].feedback = document.getElementById(`feedback-${index}`).value;
-            saveTasks();
-            alert("Salvo!");
+            const task = tasks[tIdx];
+            task.submissions[index].grade = document.getElementById(`grade-${index}`).value;
+            task.submissions[index].feedback = document.getElementById(`feedback-${index}`).value;
+            try {
+                const taskRef = doc(db, "conteudos", taskId);
+                await updateDoc(taskRef, { submissions: task.submissions });
+                alert("Nota salva!");
+            } catch (error) { console.error(error); alert("Erro ao salvar nota."); }
         };
 
-        window.handleFormSubmit = () => {
+        window.handleFormSubmit = async () => {
             const id = document.getElementById('task-id').value;
+            const btn = document.getElementById('btn-submit-modal');
+            btn.disabled = true;
+            btn.textContent = "Salvando...";
             
-            // Lógica Professor (Criar ou Editar)
-            if (!document.getElementById('professor-fields').classList.contains('hidden')) {
-                const fileInput = document.getElementById('prof-file');
-                const taskIndex = tasks.findIndex(t => t.id === id);
-                
-                const taskData = {
-                    quarter: document.getElementById('quarter').value,
-                    lesson: document.getElementById('lesson').value,
-                    type: document.getElementById('type').value,
-                    title: document.getElementById('title').value,
-                    description: document.getElementById('description').value,
-                    maxGrade: document.getElementById('max-grade').value,
-                    date: document.getElementById('date').value,
-                    allowText: document.getElementById('allow-text').checked,
-                    allowFile: document.getElementById('allow-file').checked,
-                };
+            try {
+                if (!document.getElementById('professor-fields').classList.contains('hidden')) {
+                    const fileInput = document.getElementById('prof-file');
+                    let fileName = null;
+                    let fileUrl = null;
 
-                if (taskIndex > -1) {
-                    // EDITAR: Mantém ID, Submissões e Arquivo (se não houver novo)
-                    const oldTask = tasks[taskIndex];
-                    const newFileName = fileInput.files[0] ? fileInput.files[0].name : oldTask.profAttachment;
-                    
-                    tasks[taskIndex] = {
-                        ...oldTask, // Mantém o que não mudou
-                        ...taskData, // Sobrescreve campos do form
-                        profAttachment: newFileName
+                    if (fileInput.files[0]) {
+                        const file = fileInput.files[0];
+                        fileName = file.name;
+                        const storageRef = ref(storage, `uploads/prof_${Date.now()}_${file.name}`);
+                        btn.textContent = "Enviando arquivo...";
+                        await uploadBytes(storageRef, file); 
+                        fileUrl = await getDownloadURL(storageRef); 
+                    }
+
+                    const taskData = {
+                        quarter: document.getElementById('quarter').value,
+                        lesson: document.getElementById('lesson').value,
+                        type: document.getElementById('type').value,
+                        title: document.getElementById('title').value,
+                        description: document.getElementById('description').value,
+                        maxGrade: document.getElementById('max-grade').value || null,
+                        date: document.getElementById('date').value || null,
+                        allowText: document.getElementById('allow-text').checked,
+                        allowFile: document.getElementById('allow-file').checked,
                     };
+
+                    if (fileName && fileUrl) {
+                        taskData.profAttachment = fileName;
+                        taskData.profAttachmentUrl = fileUrl;
+                    }
+
+                    if (id) {
+                        const taskRef = doc(db, "conteudos", id);
+                        await updateDoc(taskRef, taskData);
+                    } else {
+                        await addDoc(collection(db, "conteudos"), {
+                            ...taskData,
+                            profAttachment: fileName || null, 
+                            profAttachmentUrl: fileUrl || null,
+                            submissions: [],
+                            createdAt: new Date()
+                        });
+                    }
                 } else {
-                    // CRIAR NOVO
-                    tasks.push({
-                        id: Date.now().toString(),
-                        ...taskData,
-                        profAttachment: fileInput.files[0] ? fileInput.files[0].name : null,
-                        submissions: []
-                    });
+                    const taskIndex = tasks.findIndex(t => t.id === id);
+                    const taskRef = doc(db, "conteudos", id);
+                    const currentTask = tasks[taskIndex];
+                    
+                    const f = document.getElementById('student-file');
+                    const studentName = currentUser ? currentUser.username : "Anônimo";
+                    
+                    let studentFileName = null;
+                    let studentFileUrl = null;
+
+                    if (f.files[0]) {
+                        const file = f.files[0];
+                        studentFileName = file.name;
+                        const storageRef = ref(storage, `uploads/student_${currentUser.uid}_${Date.now()}_${file.name}`);
+                        btn.textContent = "Enviando seu trabalho...";
+                        await uploadBytes(storageRef, file);
+                        studentFileUrl = await getDownloadURL(storageRef);
+                    }
+
+                    const newSubmission = { 
+                        studentName: studentName, 
+                        studentUid: currentUser.uid, 
+                        text: document.getElementById('student-answer').value, 
+                        file: studentFileName || null,
+                        fileUrl: studentFileUrl || null,
+                        grade: '', 
+                        feedback: '' 
+                    };
+
+                    let subs = currentTask.submissions || [];
+                    const existIdx = subs.findIndex(s => s.studentName === studentName);
+                    
+                    if(existIdx > -1) {
+                        if(!newSubmission.file && subs[existIdx].file) {
+                             newSubmission.file = subs[existIdx].file;
+                             newSubmission.fileUrl = subs[existIdx].fileUrl;
+                        }
+                        subs[existIdx] = { ...subs[existIdx], ...newSubmission };
+                    } else {
+                        subs.push(newSubmission);
+                    }
+                    
+                    await updateDoc(taskRef, { submissions: subs });
                 }
-            } else {
-                // Lógica Aluno (Entrega)
-                const tIdx = tasks.findIndex(t => t.id === id);
-                const f = document.getElementById('student-file');
-                const sub = { studentName: CURRENT_STUDENT_NAME, text: document.getElementById('student-answer').value, file: f.files[0]?.name, grade: '', feedback: '' };
-                const exist = tasks[tIdx].submissions.findIndex(s => s.studentName === CURRENT_STUDENT_NAME);
-                if(exist > -1) tasks[tIdx].submissions[exist] = { ...tasks[tIdx].submissions[exist], ...sub };
-                else tasks[tIdx].submissions.push(sub);
+                
+                alert("Salvo com sucesso!");
+                window.closeModal();
+                loadTasks();
+            } catch (error) {
+                console.error(error);
+                alert("Erro ao salvar: " + error.message);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Confirmar";
             }
-            saveTasks();
-            window.closeModal();
         };
         
-        window.deleteTask = (id) => { if(confirm("Excluir conteúdo?")) { tasks = tasks.filter(t => t.id !== id); saveTasks(); }};
+        window.deleteTask = async (id) => { if(confirm("Excluir conteúdo?")) { try { await deleteDoc(doc(db, "conteudos", id)); alert("Excluído!"); loadTasks(); } catch (e) { alert("Erro ao excluir."); } } };
 
         loadTasks();
     </script>
