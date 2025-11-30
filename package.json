@@ -1,0 +1,24 @@
+{
+  "name": "trabalho-site-de-planner-academico",
+  "version": "1.0.0",
+  "description": "Trabalho da materia de Desenvolvimento Web",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/salleF/Trabalho-Site-de-planner-academico.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/salleF/Trabalho-Site-de-planner-academico/issues"
+  },
+  "homepage": "https://github.com/salleF/Trabalho-Site-de-planner-academico#readme",
+  "dependencies": {
+    "express": "^5.1.0"
+  }
+}

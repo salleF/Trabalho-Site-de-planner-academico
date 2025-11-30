@@ -10,8 +10,6 @@
     
     <style>
         body { font-family: 'Inter', sans-serif; }
-        
-        /* Fundo com gradiente institucional */
         .bg-univille-gradient {
             background: linear-gradient(135deg, #083f0c 0%, #002d5c 100%);
         }
@@ -25,7 +23,6 @@
         .fade-in { animation: fadeIn 0.5s ease-out; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Input customizado */
         .input-group:focus-within i { color: #008542; }
         .input-group:focus-within input { 
             border-color: #008542; 
@@ -69,7 +66,7 @@
                     <div class="mb-6">
                         <div class="flex justify-between items-center mb-2">
                             <label class="block text-slate-700 text-sm font-bold" for="password">Senha</label>
-                            <a href="#" class="text-xs text-[#008542] hover:underline font-medium">Esqueceu a senha?</a>
+                            <a href="#" onclick="handleForgotPassword(event)" class="text-xs text-[#008542] hover:underline font-medium">Esqueceu a senha?</a>
                         </div>
                         <div class="input-group relative">
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -122,10 +119,8 @@
 
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
 
-        // --- CONFIGURAÇÃO DO FIREBASE ---
-        // SUBSTITUA COM SUAS CREDENCIAIS DO CONSOLE FIREBASE
         const firebaseConfig = {
             apiKey: "AIzaSyBBkod_3W8rWTxEHe7C6fEjzs46LokAhVU",
             authDomain: "trabalho-dew-bd026.firebaseapp.com",
@@ -136,24 +131,12 @@
             measurementId: "G-GX5KXSP4SL"
         };
 
-        // Inicializa o Firebase apenas se a config tiver sido preenchida (checagem básica)
-        let app, auth;
-        if (firebaseConfig.apiKey !== "SUA_API_KEY_AQUI") {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-        } else {
-            console.warn("Firebase não configurado! Preencha a const firebaseConfig no código.");
-        }
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
 
-        // Login com Email/Senha
         window.handleLogin = async (e) => {
             e.preventDefault();
             
-            if (!auth) {
-                showToast("Erro: Configure as chaves do Firebase no código!", "error");
-                return;
-            }
-
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
             const btn = document.getElementById('btn-login');
@@ -179,13 +162,28 @@
             }
         };
 
-        // Login com Google
-        document.getElementById('btn-google').addEventListener('click', async () => {
-            if (!auth) {
-                showToast("Erro: Configure as chaves do Firebase no código!", "error");
+        window.handleForgotPassword = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            
+            if (!email) {
+                showToast("Digite seu e-mail no campo acima primeiro!", "error");
                 return;
             }
 
+            if (!confirm(`Enviar link de redefinição para: ${email}?`)) return;
+
+            try {
+                await sendPasswordResetEmail(auth, email);
+                showToast("Link enviado! Verifique seu e-mail (e spam).");
+            } catch (error) {
+                console.error(error);
+                if(error.code === 'auth/user-not-found') showToast("E-mail não cadastrado.", "error");
+                else showToast("Erro ao enviar email.", "error");
+            }
+        };
+
+        document.getElementById('btn-google').addEventListener('click', async () => {
             try {
                 const provider = new GoogleAuthProvider();
                 await signInWithPopup(auth, provider);
@@ -196,7 +194,6 @@
             }
         });
 
-        // Toggle Senha
         window.togglePassword = () => {
             const input = document.getElementById('password');
             const icon = document.getElementById('eye-icon');

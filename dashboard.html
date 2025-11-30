@@ -41,7 +41,7 @@
             box-shadow: 0 1px 3px rgba(0,0,0,0.2);
         }
         .role-btn-inactive {
-            color: #cbd5e1; /* Cinza claro */
+            color: #cbd5e1;
             background-color: transparent;
         }
         .role-btn-inactive:hover {
@@ -80,6 +80,14 @@
                         <button onclick="window.switchRole('professor')" id="btn-role-prof" class="px-4 py-1.5 text-xs font-bold rounded-md transition duration-200">Professor</button>
                         <button onclick="window.switchRole('student')" id="btn-role-student" class="px-4 py-1.5 text-xs font-bold rounded-md transition duration-200">Aluno</button>
                     </div>
+
+                    <button id="btn-join-team" onclick="document.getElementById('join-team-modal').classList.remove('hidden')" class="hidden bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded text-sm font-medium transition border border-white/10">
+                        <i class="fa-solid fa-ticket mr-1"></i> Entrar em Turma
+                    </button>
+
+                    <button id="btn-manage-teams" onclick="window.openTeamsManager()" class="hidden bg-white/10 hover:bg-white/20 text-white px-3 py-1.5 rounded text-sm font-medium transition border border-white/10">
+                        <i class="fa-solid fa-users mr-1"></i> Turmas
+                    </button>
                     
                     <button id="btn-logout" class="text-white/80 hover:text-white text-sm font-medium hover:bg-white/10 px-3 py-1 rounded transition">
                         <i class="fa-solid fa-right-from-bracket"></i> Sair
@@ -88,6 +96,73 @@
             </div>
         </div>
     </nav>
+
+    <!-- Modal Entrar em Turma -->
+    <div id="join-team-modal" class="fixed inset-0 z-[80] hidden flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 p-6">
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4 text-[#002d5c]">
+                    <i class="fa-solid fa-ticket text-3xl"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-800">Entrar em uma Turma</h3>
+                <p class="text-slate-500 text-sm">Digite o código fornecido pelo seu professor.</p>
+            </div>
+            <div class="space-y-4">
+                <input type="text" id="team-code-input" class="w-full text-center text-2xl font-mono font-bold tracking-widest border-2 border-slate-300 rounded-lg py-3 uppercase focus:border-[#008542] focus:ring-0 outline-none" placeholder="CÓDIGO" maxlength="6">
+                <button onclick="window.joinTeam()" class="w-full bg-[#008542] hover:bg-[#006b35] text-white font-bold py-3 rounded-lg shadow transition">
+                    Entrar Agora
+                </button>
+                <button onclick="document.getElementById('join-team-modal').classList.add('hidden')" class="w-full text-slate-400 font-semibold text-sm hover:text-slate-600">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="teams-manager-modal" class="fixed inset-0 z-[80] hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-[#002d5c] bg-opacity-80 transition-opacity backdrop-blur-sm" onclick="document.getElementById('teams-manager-modal').classList.add('hidden')"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen">&#8203;</span>
+            <div class="inline-block align-middle bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:max-w-3xl w-full">
+                <div class="bg-[#002d5c] px-6 py-4 flex justify-between items-center border-b border-white/10">
+                    <h3 class="text-xl font-bold text-white flex items-center gap-2"><i class="fa-solid fa-chalkboard-user"></i> Gestão de Turmas</h3>
+                    <button onclick="document.getElementById('teams-manager-modal').classList.add('hidden')" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-times text-xl"></i></button>
+                </div>
+                <div class="p-6 bg-slate-50 min-h-[300px]">
+                    <div id="teams-list-container" class="grid grid-cols-1 gap-4">
+                        <div class="text-center py-10 text-slate-400">
+                            <i class="fa-solid fa-spinner fa-spin text-3xl mb-2"></i><br>Carregando turmas...
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white p-4 border-t border-slate-200 flex justify-end">
+                    <button onclick="window.openCreateTeamModal()" class="text-[#008542] font-bold text-sm hover:underline flex items-center gap-1"><i class="fa-solid fa-plus-circle"></i> Criar Nova Turma</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="create-team-modal" class="fixed inset-0 z-[85] hidden flex items-center justify-center bg-black/70 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all scale-100 p-6">
+            <div class="text-center mb-6">
+                <h3 class="text-2xl font-bold text-slate-800 mb-2">Criar Nova Turma</h3>
+                <p class="text-slate-500 text-sm">Preencha os detalhes para criar sua turma.</p>
+            </div>
+            <div class="space-y-4">
+                <div>
+                    <label for="new-team-name" class="block text-sm font-medium text-slate-700 mb-1">Nome da Turma</label>
+                    <input type="text" id="new-team-name" class="w-full border border-slate-300 rounded-lg py-2.5 px-3 focus:border-[#008542] focus:ring-0 outline-none" placeholder="Ex: Desenvolvimento Web 2025">
+                </div>
+                <div>
+                    <label for="new-team-code" class="block text-sm font-medium text-slate-700 mb-1">Código de Convite</label>
+                    <input type="text" id="new-team-code" class="w-full border border-slate-300 rounded-lg py-2.5 px-3 uppercase focus:border-[#008542] focus:ring-0 outline-none" placeholder="Ex: WEB25" maxlength="10">
+                    <p class="text-xs text-slate-500 mt-1">Será usado pelos alunos para entrar na turma.</p>
+                </div>
+                <button onclick="window.createTeam()" class="w-full bg-[#008542] hover:bg-[#006b35] text-white font-bold py-3 rounded-lg shadow transition">
+                    Criar Turma
+                </button>
+                <button onclick="document.getElementById('create-team-modal').classList.add('hidden')" class="w-full text-slate-400 font-semibold text-sm hover:text-slate-600">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 border-b border-slate-200 pb-6">
@@ -122,6 +197,11 @@
             <div class="bg-slate-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4"><i class="fa-solid fa-layer-group text-4xl text-slate-300"></i></div>
             <h3 class="text-lg font-bold text-slate-600">Nenhum conteúdo publicado</h3>
         </div>
+
+        <div class="mt-12 border-t border-slate-200 pt-6 text-center text-xs text-slate-400">
+            <p>Academic Planner Univille &copy; 2025</p>
+            <p id="api-status-display" class="mt-1 font-mono opacity-70">Conectando ao servidor backend...</p>
+        </div>
     </main>
 
     <div id="universal-modal" class="fixed inset-0 z-[60] hidden overflow-y-auto">
@@ -139,7 +219,14 @@
                         
                         <div id="professor-fields" class="hidden space-y-5">
                             <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
-                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Organização</h4>
+                                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Destino & Organização</h4>
+                                <div class="mb-4">
+                                    <label class="block text-slate-700 text-sm font-bold mb-2">Enviar para Turma</label>
+                                    <select id="task-team-select" class="w-full border border-slate-300 rounded-lg py-2.5 px-3 bg-white focus:ring-2 focus:ring-[#008542] outline-none">
+                                        <option value="">-- Selecione uma Turma --</option>
+                                    </select>
+                                    <p class="text-xs text-slate-500 mt-1">A atividade aparecerá apenas para alunos desta turma.</p>
+                                </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-slate-700 text-sm font-bold mb-2">Bimestre</label>
@@ -278,7 +365,7 @@
     <script type="module">
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
         import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, query, orderBy, where } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+        import { getFirestore, doc, getDoc, collection, addDoc, getDocs, deleteDoc, updateDoc, query, orderBy, where, arrayUnion, arrayRemove } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
         import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 
         const firebaseConfig = {
@@ -300,12 +387,183 @@
         let currentRole = 'student'; 
         let currentFilter = 'all';
         let expandedSections = new Set();
-        let currentUser = null; 
+        let currentUser = null;
+        let teamNamesMap = {};
+
+        window.joinTeam = async () => {
+            const code = document.getElementById('team-code-input').value.trim().toUpperCase();
+            if(!code) return alert("Digite o código!");
+            
+            try {
+                const q = query(collection(db, "teams"), where("code", "==", code));
+                const querySnapshot = await getDocs(q);
+                
+                if(querySnapshot.empty) return alert("Turma não encontrada!");
+                
+                const teamDoc = querySnapshot.docs[0];
+                const teamRef = doc(db, "teams", teamDoc.id);
+                
+                await updateDoc(teamRef, {
+                    members: arrayUnion(currentUser.uid)
+                });
+                
+                alert(`Sucesso! Você entrou na turma: ${teamDoc.data().name}`);
+                document.getElementById('join-team-modal').classList.add('hidden');
+            } catch (e) {
+                console.error(e);
+                alert("Erro ao entrar na turma: " + e.message);
+            }
+        };
+
+        window.openTeamsManager = async () => {
+            const modal = document.getElementById('teams-manager-modal');
+            const container = document.getElementById('teams-list-container');
+            modal.classList.remove('hidden');
+            
+            try {
+                const q = query(collection(db, "teams"), where("professorUid", "==", currentUser.uid));
+                const snapshot = await getDocs(q);
+                
+                container.innerHTML = '';
+                
+                if(snapshot.empty) {
+                    container.innerHTML = `<div class="text-center py-10 text-slate-500 bg-white rounded-lg border border-slate-200"><i class="fa-solid fa-chalkboard text-4xl mb-3 text-slate-300"></i><p>Você não é regente de nenhuma turma ainda.</p></div>`;
+                    return;
+                }
+
+                for (const teamDoc of snapshot.docs) {
+                    const team = teamDoc.data();
+                    const memberCount = team.members ? team.members.length : 0;
+                    
+                    const teamCard = document.createElement('div');
+                    teamCard.className = "bg-white rounded-lg border border-slate-200 shadow-sm overflow-hidden";
+                    teamCard.innerHTML = `
+                        <div class="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <div>
+                                <h4 class="font-bold text-[#002d5c] text-lg">${team.name}</h4>
+                                <span class="text-xs font-mono bg-slate-200 text-slate-600 px-2 py-1 rounded">CÓDIGO: <b>${team.code}</b></span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-2xl font-bold text-[#008542]">${memberCount}</span>
+                                <p class="text-[10px] text-slate-400 uppercase">Alunos</p>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <button onclick="window.loadTeamMembers('${teamDoc.id}')" class="w-full text-sm text-blue-600 hover:bg-blue-50 py-2 rounded font-medium transition">Ver Lista de Alunos</button>
+                            <div id="members-list-${teamDoc.id}" class="hidden mt-3 space-y-2 border-t border-slate-100 pt-3">
+                                <div class="text-center text-slate-400 text-xs"><i class="fa-solid fa-spinner fa-spin"></i> Carregando nomes...</div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(teamCard);
+                }
+            } catch (e) {
+                console.error(e);
+                container.innerHTML = `<div class="text-red-500 p-4">Erro ao carregar turmas: ${e.message}</div>`;
+            }
+        };
+
+        window.loadTeamMembers = async (teamId) => {
+            const listDiv = document.getElementById(`members-list-${teamId}`);
+            if(!listDiv.classList.contains('hidden')) {
+                listDiv.classList.add('hidden');
+                return;
+            }
+            listDiv.classList.remove('hidden');
+            
+            try {
+                const teamRef = doc(db, "teams", teamId);
+                const teamSnap = await getDoc(teamRef);
+                const memberIds = teamSnap.data().members || [];
+                
+                listDiv.innerHTML = '';
+                
+                if(memberIds.length === 0) {
+                    listDiv.innerHTML = '<p class="text-xs text-slate-400 text-center italic">Nenhum aluno entrou ainda.</p>';
+                    return;
+                }
+
+                for(const uid of memberIds) {
+                    const userSnap = await getDoc(doc(db, "users", uid));
+                    const userData = userSnap.exists() ? userSnap.data() : { username: "Desconhecido", email: "N/A" };
+                    
+                    const row = document.createElement('div');
+                    row.className = "flex justify-between items-center text-sm bg-slate-50 p-2 rounded";
+                    row.innerHTML = `
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 rounded-full bg-slate-200 overflow-hidden"><img src="${userData.photoURL || 'https://ui-avatars.com/api/?name=User'}" class="w-full h-full object-cover"></div>
+                            <span class="font-medium text-slate-700">${userData.username || 'Aluno'}</span>
+                        </div>
+                        <button onclick="window.removeStudent('${teamId}', '${uid}')" class="text-red-400 hover:text-red-600 text-xs" title="Remover da turma"><i class="fa-solid fa-user-minus"></i></button>
+                    `;
+                    listDiv.appendChild(row);
+                }
+
+            } catch(e) {
+                listDiv.innerHTML = `<p class="text-xs text-red-500">Erro: ${e.message}</p>`;
+            }
+        };
+
+        window.removeStudent = async (teamId, studentUid) => {
+            if(!confirm("Remover este aluno da turma?")) return;
+            try {
+                await updateDoc(doc(db, "teams", teamId), {
+                    members: arrayRemove(studentUid)
+                });
+                alert("Aluno removido.");
+                window.loadTeamMembers(teamId);
+            } catch(e) { alert("Erro: " + e.message); }
+        };
+        
+        window.openCreateTeamModal = () => {
+            document.getElementById('create-team-modal').classList.remove('hidden');
+            document.getElementById('new-team-name').value = '';
+            document.getElementById('new-team-code').value = '';
+        };
+
+        window.createTeam = async () => {
+            const name = document.getElementById('new-team-name').value.trim();
+            const code = document.getElementById('new-team-code').value.trim().toUpperCase();
+
+            if(!name || !code) return alert("Nome e Código da turma são obrigatórios!");
+            if(code.length < 3) return alert("O código da turma deve ter pelo menos 3 caracteres.");
+
+            try {
+                const q = query(collection(db, "teams"), where("code", "==", code));
+                const snapshot = await getDocs(q);
+                if (!snapshot.empty) return alert("Já existe uma turma com este código. Escolha outro.");
+
+                await addDoc(collection(db, "teams"), {
+                    name: name,
+                    code: code,
+                    professorUid: currentUser.uid,
+                    members: [],
+                    createdAt: new Date()
+                });
+                alert("Turma criada com sucesso!");
+                document.getElementById('create-team-modal').classList.add('hidden');
+                window.openTeamsManager();
+            } catch(e) {
+                console.error(e);
+                alert("Erro ao criar turma: " + e.message);
+            }
+        };
+
+        console.log("Iniciando Dashboard...");
+        setTimeout(() => {
+            const loading = document.getElementById('loading-screen');
+            if(loading && loading.style.display !== 'none') {
+                console.warn("Carregamento demorou muito. Forçando exibição.");
+                loading.style.display = 'none';
+            }
+        }, 8000);
 
         onAuthStateChanged(auth, async (user) => {
+            console.log("Estado Auth mudou:", user ? "Logado" : "Deslogado");
             const loadingScreen = document.getElementById('loading-screen');
             if (user) {
                 try {
+                    console.log("Buscando perfil do usuário:", user.uid);
                     const userDoc = await getDoc(doc(db, "users", user.uid));
                     if (userDoc.exists()) {
                         currentUser = userDoc.data();
@@ -314,12 +572,12 @@
                             document.getElementById('role-switcher').classList.remove('hidden'); 
                             document.getElementById('btn-requests').classList.remove('hidden');
                             window.switchRole('professor'); 
-                            checkRequests(); 
                         } else {
                             document.getElementById('role-switcher').classList.add('hidden'); 
                             document.getElementById('btn-requests').classList.add('hidden');
                             window.switchRole('student'); 
                         }
+                        loadTasks();
                     } else { await signOut(auth); window.location.href = 'login.html'; }
                 } catch (error) { console.error("Erro auth:", error); } finally { loadingScreen.style.display = 'none'; }
             } else { window.location.href = 'login.html'; }
@@ -334,6 +592,22 @@
             const badge = document.getElementById('requests-badge');
             if (!snapshot.empty) badge.classList.remove('hidden'); else badge.classList.add('hidden');
         }
+
+        async function checkBackendStatus() {
+            try {
+                const response = await fetch('/api/status');
+                if (response.ok) {
+                    const data = await response.json();
+                    const serverTime = new Date(data.serverTime).toLocaleTimeString();
+                    document.getElementById('api-status-display').innerHTML = 
+                        `<i class="fa-solid fa-server text-green-500"></i> Backend Online • Server Time: ${serverTime} • Uptime: ${Math.floor(data.uptime)}s`;
+                }
+            } catch (error) {
+                console.warn("Backend Express não detectado (usando apenas Firebase).", error);
+                document.getElementById('api-status-display').textContent = "Modo Serverless (Firebase Direct)";
+            }
+        }
+        checkBackendStatus();
 
         window.openRequestsModal = async () => {
             const modal = document.getElementById('requests-modal');
@@ -367,11 +641,46 @@
 
         async function loadTasks() {
             tasks = [];
+            teamNamesMap = {};
             try {
+                console.log("Iniciando loadTasks para:", currentUser.uid, "Role:", currentUser.isProfessor ? "Prof" : "Aluno");
+                let myTeamIds = [];
+                
+                if (currentUser && currentUser.isProfessor) {
+                    const qTeams = query(collection(db, "teams"), where("professorUid", "==", currentUser.uid));
+                    const snaps = await getDocs(qTeams);
+                    snaps.forEach(doc => {
+                        myTeamIds.push(doc.id);
+                        teamNamesMap[doc.id] = doc.data().name;
+                    });
+                } else if (currentUser) {
+                    const qTeams = query(collection(db, "teams"), where("members", "array-contains", currentUser.uid));
+                    const snaps = await getDocs(qTeams);
+                    snaps.forEach(doc => {
+                        myTeamIds.push(doc.id);
+                        teamNamesMap[doc.id] = doc.data().name;
+                    });
+                }
+                
+                console.log("Minhas Turmas:", teamNamesMap);
+
                 const q = query(collection(db, "conteudos"));
                 const querySnapshot = await getDocs(q);
-                querySnapshot.forEach((doc) => { tasks.push({ id: doc.id, ...doc.data() }); });
-                if (tasks.length > 0) expandedSections.add(tasks[0].quarter);
+                
+                querySnapshot.forEach((doc) => {
+                    const t = doc.data();
+                    
+                    const isGlobal = !t.teamId;
+                    const isMyTeam = myTeamIds.includes(t.teamId);
+                    
+                    if (isGlobal || isMyTeam) {
+                        tasks.push({ id: doc.id, ...t });
+                    }
+                });
+                
+                console.log("Total de tarefas carregadas:", tasks.length);
+                
+                if (tasks.length > 0 && tasks[0].quarter) expandedSections.add(tasks[0].quarter);
                 renderTasks();
             } catch (error) { console.error("Erro tarefas:", error); }
         }
@@ -434,15 +743,24 @@
             const btnProf = document.getElementById('btn-role-prof');
             const btnStud = document.getElementById('btn-role-student');
             const badge = document.getElementById('mode-badge');
+            
+            const btnJoinTeam = document.getElementById('btn-join-team');
+            const btnManageTeams = document.getElementById('btn-manage-teams');
 
             if (role === 'professor') {
                 btnCreate.classList.remove('hidden');
+                btnManageTeams.classList.remove('hidden');
+                btnJoinTeam.classList.add('hidden');
+                
                 btnProf.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-active";
                 btnStud.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-inactive";
                 badge.textContent = "Modo Professor";
                 badge.className = "ml-2 text-[10px] uppercase font-bold px-2 py-0.5 rounded border bg-green-100 text-green-800 border-green-200";
             } else {
                 btnCreate.classList.add('hidden');
+                btnManageTeams.classList.add('hidden');
+                btnJoinTeam.classList.remove('hidden');
+                
                 btnStud.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-active";
                 btnProf.className = "px-4 py-1.5 text-xs font-bold rounded-md transition duration-200 role-btn-inactive";
                 badge.textContent = "Modo Aluno";
@@ -461,6 +779,9 @@
             const borderClass = isActivity ? 'border-l-green-500' : 'border-l-blue-400';
             const dateDisplay = task.date ? `<div class="text-xs text-slate-500 mt-2 font-medium bg-slate-50 inline-block px-2 py-1 rounded"><i class="fa-regular fa-clock"></i> Entrega: ${new Date(task.date).toLocaleDateString('pt-BR')}</div>` : '';
             
+            const teamName = task.teamId ? (teamNamesMap[task.teamId] || 'Turma Desconhecida') : 'Geral';
+            const teamBadge = `<span class="ml-2 inline-block bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded border border-purple-200 uppercase tracking-wider">${teamName}</span>`;
+
             let attachmentHtml = '';
             if (task.profAttachment) {
                 if (task.profAttachmentUrl) {
@@ -498,11 +819,11 @@
             }
             const card = document.createElement('div');
             card.className = `bg-white rounded-lg shadow-sm border border-slate-200 p-5 hover:shadow-md transition duration-200 flex flex-col justify-between border-l-4 ${borderClass}`;
-            card.innerHTML = `<div><div class="flex items-start justify-between mb-2"><h3 class="font-bold text-lg text-slate-800 leading-tight">${task.title}</h3><div class="bg-slate-50 p-2 rounded-lg text-lg">${icon}</div></div><p class="text-sm text-slate-600 mb-3">${task.description || ''}</p>${attachmentHtml}${dateDisplay}${feedbackHtml}</div>${footerActions}`;
+            card.innerHTML = `<div><div class="flex items-start justify-between mb-2"><div class="flex-1"><h3 class="font-bold text-lg text-slate-800 leading-tight inline">${task.title}</h3>${teamBadge}</div><div class="bg-slate-50 p-2 rounded-lg text-lg ml-3">${icon}</div></div><p class="text-sm text-slate-600 mb-3">${task.description || ''}</p>${attachmentHtml}${dateDisplay}${feedbackHtml}</div>${footerActions}`;
             return card;
         }
 
-        window.openModal = (mode, id = null) => {
+        window.openModal = async (mode, id = null) => {
             const modal = document.getElementById('universal-modal');
             const form = document.getElementById('task-form');
             const profFields = document.getElementById('professor-fields');
@@ -530,6 +851,33 @@
                 profFields.classList.remove('hidden');
                 title.innerHTML = '<i class="fa-solid fa-plus"></i> Novo Conteúdo';
                 window.toggleGradeField();
+                
+                const teamSelect = document.getElementById('task-team-select');
+                teamSelect.innerHTML = '<option value="">-- Selecione uma Turma --</option>';
+                try {
+                    console.log("Buscando turmas para o professor:", currentUser.uid);
+                    const q = query(collection(db, "teams"), where("professorUid", "==", currentUser.uid));
+                    const snaps = await getDocs(q);
+                    console.log("Turmas encontradas:", snaps.size);
+                    
+                    if (snaps.empty) {
+                        const opt = document.createElement('option');
+                        opt.disabled = true;
+                        opt.textContent = "Nenhuma turma encontrada (Crie uma antes!)";
+                        teamSelect.appendChild(opt);
+                    }
+
+                    snaps.forEach(doc => {
+                        const opt = document.createElement('option');
+                        opt.value = doc.id;
+                        opt.textContent = `${doc.data().name} (${doc.data().code})`;
+                        teamSelect.appendChild(opt);
+                    });
+                } catch(e) { 
+                    console.error("Erro carregando turmas select", e);
+                    alert("Erro ao buscar turmas. Verifique o console.");
+                }
+
             } else if (mode === 'edit') {
                 profFields.classList.remove('hidden');
                 title.innerHTML = '<i class="fa-solid fa-pen"></i> Editar Conteúdo';
@@ -647,6 +995,8 @@
             
             try {
                 if (!document.getElementById('professor-fields').classList.contains('hidden')) {
+                    const idTeam = document.getElementById('task-team-select').value;
+                    
                     const fileInput = document.getElementById('prof-file');
                     let fileName = null;
                     let fileUrl = null;
@@ -661,6 +1011,7 @@
                     }
 
                     const taskData = {
+                        teamId: idTeam || null,
                         quarter: document.getElementById('quarter').value,
                         lesson: document.getElementById('lesson').value,
                         type: document.getElementById('type').value,
@@ -748,8 +1099,6 @@
         };
         
         window.deleteTask = async (id) => { if(confirm("Excluir conteúdo?")) { try { await deleteDoc(doc(db, "conteudos", id)); alert("Excluído!"); loadTasks(); } catch (e) { alert("Erro ao excluir."); } } };
-
-        loadTasks();
     </script>
 </body>
 </html>

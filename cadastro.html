@@ -121,7 +121,6 @@
         import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
         import { getStorage, ref, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-storage.js';
 
-        // --- CONFIGURAÇÃO DO FIREBASE ---
         const firebaseConfig = {
             apiKey: "AIzaSyBBkod_3W8rWTxEHe7C6fEjzs46LokAhVU",
             authDomain: "trabalho-dew-bd026.firebaseapp.com",
@@ -137,7 +136,6 @@
         const db = getFirestore(app);
         const storage = getStorage(app);
 
-        // Gerar Tag Aleatória
         const userTag = Math.floor(1000 + Math.random() * 9000);
         document.getElementById('tag-preview').textContent = userTag;
 
@@ -146,7 +144,6 @@
         window.previewImage = (event) => {
             const file = event.target.files[0];
             if (file) {
-                // Validação simples de tamanho (ex: Max 2MB)
                 if (file.size > 2 * 1024 * 1024) {
                     showToast("A imagem deve ter no máximo 2MB.", "error");
                     return;
@@ -163,7 +160,6 @@
         };
 
         window.updateTagPreview = () => {
-            // Apenas visual
         };
 
         window.handleSignup = async (e) => {
@@ -172,7 +168,7 @@
             const username = document.getElementById('username').value.trim();
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const requestProfessor = document.getElementById('request-professor').checked; // Pega o valor do checkbox
+            const requestProfessor = document.getElementById('request-professor').checked;
             const fullDiscordTag = `${username}#${userTag}`;
 
             if(!username) return showToast("Escolha um nome de usuário", "error");
@@ -183,34 +179,27 @@
             btn.disabled = true;
 
             try {
-                // 1. Criar Usuário no Firebase Auth primeiro (para ter o UID)
                 btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Criando Conta...';
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
 
-                let photoURL = "https://ui-avatars.com/api/?name=" + username + "&background=random"; // Padrão
+                let photoURL = "https://ui-avatars.com/api/?name=" + username + "&background=random";
 
-                // 2. Upload para o Firebase Storage (se tiver arquivo)
                 if (selectedFile) {
                     btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-up fa-bounce"></i> Enviando Foto...';
-                    
-                    // Cria uma referência: profile_photos/UID_DO_USUARIO.jpg
+
                     const storageRef = ref(storage, `profile_photos/${user.uid}`);
                     
-                    // Upload do arquivo
                     await uploadBytes(storageRef, selectedFile);
                     
-                    // Pega a URL pública
                     photoURL = await getDownloadURL(storageRef);
                 }
 
-                // 3. Atualizar Perfil Básico do Auth
                 await updateProfile(user, {
                     displayName: fullDiscordTag,
                     photoURL: photoURL
                 });
 
-                // 4. Salvar Dados Completos no Firestore
                 btn.innerHTML = '<i class="fa-solid fa-database"></i> Salvando Perfil...';
                 await setDoc(doc(db, "users", user.uid), {
                     uid: user.uid,
@@ -219,10 +208,10 @@
                     discriminator: userTag.toString(),
                     fullTag: fullDiscordTag,
                     photoURL: photoURL,
-                    isProfessor: false, // Por padrão, todo mundo é aluno. Os devs mudam depois.
-                    requestedProfessorAccess: requestProfessor, // Indica se o usuário pediu acesso como professor
+                    isProfessor: false,
+                    requestedProfessorAccess: requestProfessor,
                     createdAt: new Date(),
-                    storagePath: selectedFile ? `profile_photos/${user.uid}` : null // Útil se quiser apagar depois
+                    storagePath: selectedFile ? `profile_photos/${user.uid}` : null
                 });
 
                 showToast("Conta criada com sucesso!");
@@ -236,8 +225,6 @@
                 if (error.code === 'storage/unauthorized') msg = "Erro de permissão ao salvar imagem.";
                 showToast(msg, "error");
                 
-                // Opcional: Se falhar no meio, poderíamos deletar o usuário criado, 
-                // mas por simplicidade vamos deixar o usuário tentar de novo ou tratar depois.
                 btn.innerHTML = originalText;
                 btn.disabled = false;
             }
