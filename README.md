@@ -40,7 +40,7 @@ A aplicação utiliza uma arquitetura híbrida, combinando a forte segurança do
 *   **Armazenamento:** Google Cloud Storage.
 *   **Autenticação:** Firebase Authentication.
 
-## 👥 Desenvolverdores (Grupo 09)
+## 👥 Desenvolvedores (Grupo 09)
 
 *   **Felipe Ortiz**
 *   **Matheus Rocha**
